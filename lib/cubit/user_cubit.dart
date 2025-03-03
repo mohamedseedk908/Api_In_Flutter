@@ -2,10 +2,13 @@ import 'package:api/cache/cache_helper.dart';
 import 'package:api/core/api/api_consumer.dart';
 import 'package:api/core/api/end_point.dart';
 import 'package:api/core/errors/exception.dart';
+import 'package:api/core/functions/upload_image_to.dart';
 import 'package:api/cubit/user_state.dart';
 import 'package:api/model/signin_model.dart';
+import 'package:api/model/signup_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 class UserCubit extends Cubit<UserState> {
@@ -20,7 +23,7 @@ class UserCubit extends Cubit<UserState> {
   //Sign Up Form key
   GlobalKey<FormState> signUpFormKey = GlobalKey();
   //Profile Pic
-  //XFile? profilePic;
+  XFile? profilePic;
   //Sign up name
   TextEditingController signUpName = TextEditingController();
   //Sign up phone number
@@ -50,6 +53,30 @@ class UserCubit extends Cubit<UserState> {
       emit(SignInSuccess());
     } on ServerException catch (e) {
       emit(SignInFailure(errMessage: e.errModel.errorMessage));
+    }
+  }
+
+  uploadProfilePic(XFile image) {
+    profilePic = image;
+    emit(UploadProfilePic());
+  }
+
+  signUp() async {
+    try {
+      emit(SignUpLoading());
+      final response = await api.post(EndPoint.signUp, isFromData: true, data: {
+        ApiKey.name: signUpName.text,
+        ApiKey.email: signUpEmail.text,
+        ApiKey.phone: signUpPhoneNumber.text,
+        ApiKey.password: signInPassword.text,
+        ApiKey.confirmPassword: confirmPassword.text,
+        ApiKey.location: "",
+        ApiKey.profilePic: await uploadImageToApi(profilePic!),
+      });
+      final signUpModel = SignUpModel.fromJson(response);
+      emit(SignUpSuccess(message: signUpModel.message));
+    } on ServerException catch (e) {
+      emit(SignUpFailure(errMessage: e.errModel.errorMessage));
     }
   }
 }
