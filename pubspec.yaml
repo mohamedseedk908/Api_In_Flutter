@@ -38,6 +38,9 @@ dependencies:
   bloc: ^9.0.0
   flutter_bloc: ^9.0.0
   image_pickers: ^2.0.5+2
+  jwt_decoder: ^2.0.1
+  shared_preferences: ^2.5.2
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

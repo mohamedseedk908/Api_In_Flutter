@@ -7,9 +7,6 @@ class ServerException implements Exception {
   ServerException({required this.errModel});
 }
 
-
-
-
 void handleDioException(DioException e) {
   switch (e.type) {
     case DioExceptionType.connectionTimeout:
