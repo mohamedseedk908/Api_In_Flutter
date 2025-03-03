@@ -1,5 +1,5 @@
 import 'package:api/cubit/user_cubit.dart';
-import 'package:api/screens/profile_screen.dart';
+import 'package:api/cubit/user_state.dart';
 import 'package:api/widgets/%20page_header.dart';
 import 'package:api/widgets/custom_form_button.dart';
 import 'package:api/widgets/custom_input_field.dart';
@@ -17,7 +17,17 @@ class SignInScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return SafeArea(
-      child: Scaffold(
+      child: BlocConsumer<UserCubit, UserState>(
+  listener: (context, state) {
+    if(state is SignInSuccess){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("succes")));
+    }else if (state is SignInFailure)
+      {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errMessage)));
+      }
+  },
+  builder: (context, state) {
+    return Scaffold(
         backgroundColor: const Color(0xffEEF1F3),
         body: Column(
           children: [
@@ -56,19 +66,21 @@ class SignInScreen extends StatelessWidget {
                         ForgetPasswordWidget(size: size),
                         const SizedBox(height: 20),
                         //!Sign In Button
-                        CustomFormButton(
+                        state is SignInLoading ? CircularProgressIndicator() : CustomFormButton(
                           innerText: 'Sign In',
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ProfileScreen(),
-                              ),
-                            );
+
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => const ProfileScreen(),
+                            //   ),
+                            // );
+
                           },
                         ),
                         const SizedBox(height: 18),
-                        //! Dont Have An Account ?
+                        //! Don't Have An Account ?
                         DontHaveAnAccountWidget(size: size),
                         const SizedBox(height: 20),
                       ],
@@ -79,7 +91,9 @@ class SignInScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      );
+  },
+),
     );
   }
 }
